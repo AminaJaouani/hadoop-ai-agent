@@ -1,0 +1,19 @@
+services:
+  mcp-server:
+    build: .
+    command: uvicorn mcp_server:app --host 0.0.0.0 --port 8000
+    environment:
+      - HBASE_REST_URL=http://host.docker.internal:8070
+    ports:
+      - "8000:8000"
+
+  streamlit:
+    build: .
+    command: streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+    env_file: .env
+    environment:
+      - MCP_SERVER_URL=http://mcp-server:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mcp-server
